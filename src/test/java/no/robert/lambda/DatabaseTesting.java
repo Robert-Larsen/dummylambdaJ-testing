@@ -3,8 +3,6 @@ package no.robert.lambda;
 import static no.robert.lambda.LambdaCriteria.having;
 
 import java.lang.reflect.Method;
-import java.util.List;
-
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.InvocationHandler;
 
@@ -20,8 +18,8 @@ public class DatabaseTesting
     {
         LambdaHibernateTemplate hibernateTemplate = new LambdaHibernateTemplate(new HibernateTemplate());
         
-        
-        DetachedCriteria criteria = having(on( Bok.class ).getForfatter()).eq("Forfatter1");
+        DetachedCriteria criteria = having(on( Book.class ).getPages()).eq( "Forfatter1" );
+        System.out.println(criteria.getClass());
 //        List<Bok> boker = hibernateTemplate.find( Bok.class, criteria );
     }
     
@@ -31,6 +29,8 @@ public class DatabaseTesting
             @Override
             public Object invoke( Object arg0, Method method, Object[] arg2 ) throws Throwable
             {
+                System.out.println(method.getName());
+                
                 LambdaCriteria.lastMethod.set( method );
                 
                 return null;

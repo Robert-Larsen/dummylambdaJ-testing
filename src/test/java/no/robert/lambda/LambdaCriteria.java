@@ -18,8 +18,7 @@ public class LambdaCriteria
 
     public static LambdaCriteria having( Object expression )
     {
-        
-        return new LambdaCriteria(lastMethod.get());
+        return new LambdaCriteria( lastMethod.get() );
     }
 
     public DetachedCriteria eq( String string )
