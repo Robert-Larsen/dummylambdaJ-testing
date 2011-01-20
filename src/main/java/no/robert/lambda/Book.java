@@ -1,8 +1,12 @@
 package no.robert.lambda;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -12,18 +16,25 @@ import org.hibernate.annotations.GenericGenerator;
 public class Book
 {
     private String title;
-    private String author;
     private int pages;
+    @OneToMany
+    private Set<Author> authors;
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy = "increment")
     private Long id;
 
-    public Book( String title, String author, int pages )
+    public Book( String title, Set<Author> authors, int pages )
     {
         this.title = title;
-        this.author = author;
+        this.authors = authors;
         this.pages = pages;
+    }
+    
+    public Book( String title, String authorName, int pages )
+    {
+        authors = new HashSet<Author>();
+        authors.add( new Author( authorName ) );
     }
 
     public Book()
@@ -31,9 +42,9 @@ public class Book
         // TODO Auto-generated constructor stub
     }
 
-    public Book( String author )
+    public Book( Set<Author> authors )
     {
-        this.author = author;
+        this.authors = authors;
     }
     
 
@@ -58,14 +69,14 @@ public class Book
         this.pages = pages;
     }
     
-    public String getAuthor()
+    public Set<Author> getAuthor()
     {
-        return this.author;
+        return this.authors;
     }
     
-    public void setAuthor( String author )
+    public void setAuthor( Set<Author> authors )
     {
-        this.author = author;
+        this.authors = authors;
     }
    
     public String getTitle()
