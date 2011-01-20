@@ -14,11 +14,11 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.criteria.*;
 
-public class Shelf
+public class BookDAO
 {
     EntityManagerFactory entityManagerFactory;
        
-    public Shelf()
+    public BookDAO()
     {
         try
         {
