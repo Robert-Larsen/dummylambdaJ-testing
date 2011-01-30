@@ -44,6 +44,20 @@ public class BookDAO
         em.close();
         
     }
+    
+    public Book getBook( String bookname )
+    {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
+        
+        CriteriaQuery<Book> criteria = builder.createQuery( Book.class );
+        Root<Book> book = criteria.from( Book.class );
+        criteria.select( book );
+        criteria.where( builder.equal( book.get( "title" ), bookname ) );
+        
+        return em.createQuery( criteria ).getSingleResult();
+        
+    }
 
     public int getNumberOfBooks()
     {

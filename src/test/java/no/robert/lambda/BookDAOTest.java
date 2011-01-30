@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.swing.JOptionPane;
 /*
  import org.hamcrest.Matcher;
  import org.hamcrest.Matchers;
@@ -16,11 +18,13 @@ import org.junit.Test;
 public class BookDAOTest
 {
     BookDAO shelf;
+    AuthorDAO authors;
 
     @Before
     public void setUp()
     {
         shelf = new BookDAO();
+        authors = new AuthorDAO();
     }
 
     @Test
@@ -29,31 +33,32 @@ public class BookDAOTest
         assertThat( shelf.getNumberOfBooks(), is( 0 ) );
     }
 
-    @Test
-    @Ignore
+    @Test   
     public void add()
     {
-        Set<Author> authors = new HashSet<Author>();
-        authors.add( new Author( "Someone" ) );
-        authors.add( new Author( "Someone else" ) );
-        shelf.add( new Book( "Something", authors, 1 ) );
-
-        shelf.add( new Book( "Something else", "Another author", 2 ) );
-
-        assertThat( shelf.getNumberOfBooks(), is( 2 ) );
-    }
+        Author author1 = new Author( "Someone" );
+        authors.add(  author1 );
+        Author author2 = new Author( "Someone else" );
+        authors.add( author2 );
+        Set<Author> authorsSet = new HashSet<Author>();
+        shelf.add( new Book( "A book", authorsSet, 100 ) );
+        assertThat( shelf.getNumberOfBooks(), is( 1 ) );
+    } 
 
     @Test
     @Ignore
     public void remove()
-    {
-        Book book = new Book( "Something", "Someone", 1 );
-        shelf.add( book );
-
-        assertThat( shelf.getNumberOfBooks(), is( 3 ) );
-
+    {   
+        Author author1 = new Author( "Someone" );
+        authors.add( author1 );
+        shelf.add( new Book( "A new book", author1, 100 ) );
+        int numberofbooks = shelf.getNumberOfBooks();
+        Book book = shelf.getBook( "A new book" );
+               
         shelf.remove( book );
 
-        assertThat( shelf.getNumberOfBooks(), is( 2 ) );
+        assertThat( shelf.getNumberOfBooks(), is( numberofbooks-1 ) );        
     }
+    
+    
 }

@@ -31,10 +31,10 @@ public class Book
         this.pages = pages;
     }
     
-    public Book( String title, String authorName, int pages )
+    public Book( String title, Author author, int pages )
     {
         authors = new HashSet<Author>();
-        authors.add( new Author( authorName ) );
+        authors.add( author );
     }
 
     public Book()
