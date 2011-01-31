@@ -33,20 +33,16 @@ public class Book
     
     public Book( String title, Author author, int pages )
     {
-        authors = new HashSet<Author>();
-        authors.add( author );
+        this.title = title;
+        this.authors = new HashSet<Author>();
+        this.authors.add( author );
+        this.pages = pages;
     }
 
     public Book()
     {
         // TODO Auto-generated constructor stub
     }
-
-    public Book( Set<Author> authors )
-    {
-        this.authors = authors;
-    }
-    
 
     public Long getId()
     {
@@ -69,12 +65,12 @@ public class Book
         this.pages = pages;
     }
     
-    public Set<Author> getAuthor()
+    public Set<Author> getAuthors()
     {
         return this.authors;
     }
     
-    public void setAuthor( Set<Author> authors )
+    public void setAuthors( Set<Author> authors )
     {
         this.authors = authors;
     }

@@ -16,11 +16,11 @@ public class DatabaseTesting
     @Test
     public void testname()
     {
-        LambdaHibernateTemplate hibernateTemplate = new LambdaHibernateTemplate(new HibernateTemplate());
+        LambdaHibernateTemplate hibernateTemplate = new LambdaHibernateTemplate( new HibernateTemplate() );
         
         DetachedCriteria criteria = having(on( Book.class ).getPages()).eq( "Forfatter1" );
-        System.out.println(criteria.getClass());
-//        List<Bok> boker = hibernateTemplate.find( Bok.class, criteria );
+        
+        //List<Bok> boker = hibernateTemplate.find( Bok.class, criteria );
     }
     
     private <T> T on(Class<T> type) {

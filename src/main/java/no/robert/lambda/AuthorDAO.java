@@ -54,6 +54,19 @@ public class AuthorDAO
         return number;
     }
     
+    public Author getAuthor( String authorname )
+    {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
+        
+        CriteriaQuery<Author> criteria = builder.createQuery( Author.class );
+        Root<Author> author = criteria.from( Author.class );
+        criteria.select( author );
+        criteria.where( builder.equal( author.get( "name" ), authorname ) );
+        
+        return em.createQuery( criteria ).getSingleResult();
+    }
+    
     public void remove( Author author )
     {
         EntityManager em = entityManagerFactory.createEntityManager();
