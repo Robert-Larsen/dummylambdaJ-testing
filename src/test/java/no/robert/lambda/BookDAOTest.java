@@ -1,19 +1,20 @@
 package no.robert.lambda;
 
+import static no.robert.lambda.LambdaCriteria.having;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.swing.JOptionPane;
-/*
- import org.hamcrest.Matcher;
- import org.hamcrest.Matchers;
- */
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.InvocationHandler;
+
+import org.hibernate.criterion.DetachedCriteria;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 
 public class BookDAOTest
 {
@@ -71,6 +72,32 @@ public class BookDAOTest
         shelf.remove( book );
 
         assertThat( numberofbooks, is( shelf.getNumberOfBooks() ) );        
+    }
+    
+    @Test
+    public void lambdaTest()
+    {
+        LambdaHibernateTemplate hibernateTemplate = new LambdaHibernateTemplate( new HibernateTemplate() );
+        
+        DetachedCriteria criteria = having(on( Book.class ).getTitle() ).eq( "A book" );
+        
+        //List<Bok> boker = hibernateTemplate.find( Bok.class, criteria );
+    }
+    
+    private <T> T on(Class<T> type) {
+        return (T)Enhancer.create( type, new InvocationHandler() {
+
+            @Override
+            public Object invoke( Object arg0, Method method, Object[] arg2 ) throws Throwable
+            {
+                System.out.println( method.getName() );
+                
+                LambdaCriteria.lastMethod.set( method );
+                
+                return null;
+            }
+            
+        });
     }
     
     

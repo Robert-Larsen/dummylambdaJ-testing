@@ -18,7 +18,7 @@ public class DatabaseTesting
     {
         LambdaHibernateTemplate hibernateTemplate = new LambdaHibernateTemplate( new HibernateTemplate() );
         
-        DetachedCriteria criteria = having(on( Book.class ).getPages()).eq( "Forfatter1" );
+        DetachedCriteria criteria = having(on( Book.class ).getTitle() ).eq( "Forfatter1" );
         
         //List<Bok> boker = hibernateTemplate.find( Bok.class, criteria );
     }
@@ -29,7 +29,7 @@ public class DatabaseTesting
             @Override
             public Object invoke( Object arg0, Method method, Object[] arg2 ) throws Throwable
             {
-                System.out.println(method.getName());
+                System.out.println( method.getName() );
                 
                 LambdaCriteria.lastMethod.set( method );
                 
