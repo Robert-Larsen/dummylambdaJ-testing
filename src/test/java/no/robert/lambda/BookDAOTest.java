@@ -1,16 +1,24 @@
 package no.robert.lambda;
 
 import static no.robert.lambda.LambdaCriteria.having;
+import static no.robert.lambda.LambdaCriteria.on;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.criteria.CriteriaQuery;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.InvocationHandler;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.criterion.DetachedCriteria;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,11 +28,18 @@ public class BookDAOTest
 {
     BookDAO shelf;
     AuthorDAO authors;
+    private LambdaRepository repository;
+    
+    
 
     @Before
     public void setUp()
     {
+        EntityManagerFactory entityMgr = Persistence.createEntityManagerFactory( "no.robert.lambda" );
+        repository = new LambdaRepository();
+        repository.setEntityManagerFactory( entityMgr );
         shelf = new BookDAO();
+        shelf.setEntityManagerFactory( entityMgr );
         authors = new AuthorDAO();
     }
 
@@ -77,28 +92,15 @@ public class BookDAOTest
     @Test
     public void lambdaTest()
     {
-        LambdaHibernateTemplate hibernateTemplate = new LambdaHibernateTemplate( new HibernateTemplate() );
+        Author author = new Author( "Someone" );
+        authors.add( author );
+        shelf.add( new Book( "A book", author, 10 ) );
         
-        DetachedCriteria criteria = having(on( Book.class ).getTitle() ).eq( "A book" );
-        
-        //List<Bok> boker = hibernateTemplate.find( Bok.class, criteria );
+        List<Book> books = repository.find( having(Book.class, on( Book.class ).getTitle() ).eq( "A book" ) );
+        assertThat( books.size(), is( 1 ) );
     }
     
-    private <T> T on(Class<T> type) {
-        return (T)Enhancer.create( type, new InvocationHandler() {
 
-            @Override
-            public Object invoke( Object arg0, Method method, Object[] arg2 ) throws Throwable
-            {
-                System.out.println( method.getName() );
-                
-                LambdaCriteria.lastMethod.set( method );
-                
-                return null;
-            }
-            
-        });
-    }
     
     
 }

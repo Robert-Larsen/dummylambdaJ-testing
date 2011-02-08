@@ -16,24 +16,8 @@ import javax.persistence.criteria.*;
 
 public class BookDAO
 {
-    EntityManagerFactory entityManagerFactory;
+    private EntityManagerFactory entityManagerFactory;
        
-    public BookDAO()
-    {
-        try
-        {
-            setUp();
-        }
-        catch ( Exception e )
-        {
-            e.printStackTrace();
-        }
-    }
-    
-    private void setUp() throws Exception
-    {
-        entityManagerFactory = Persistence.createEntityManagerFactory( "no.robert.lambda" );
-    }
     
     public void add( Book bok )
     {
@@ -83,5 +67,10 @@ public class BookDAO
         em.remove( em.merge( book ) );
         em.getTransaction().commit();
         em.close();
+    }
+
+    public void setEntityManagerFactory( EntityManagerFactory entityManagerFactory )
+    {
+        this.entityManagerFactory = entityManagerFactory;
     }
 }
