@@ -33,7 +33,7 @@ public class LambdaCriteria<T>
             @Override
             public Object invoke( Object arg0, Method method, Object[] arg2 ) throws Throwable
             {
-                System.out.println( type.getSimpleName() + "." + method.getName() );
+                //System.out.println( type.getSimpleName() + "." + method.getName() );
                 
                 LambdaCriteria.lastMethod.set( method );
                 LambdaCriteria.lastType.set( type );
@@ -59,11 +59,11 @@ public class LambdaCriteria<T>
 
     public CriteriaQuery<T> eq( String string )
     {
-        System.out.println( method.getName() + " = " + string );
+        //System.out.println( method.getName() + " = " + string );
         CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
         
         CriteriaQuery<T> criteria = builder.createQuery( type );
-        Path<Object> property = criteria.from( type ).get( asProperty(method) );
+        Path<Object> property = criteria.from( type ).get( asProperty( method ) );
         return criteria.where( builder.equal( property, string ) );
     }
 
@@ -72,7 +72,4 @@ public class LambdaCriteria<T>
     {
         return uncapitalize( method.getName().substring( 3 ) );
     }
-    
-    
-
 }

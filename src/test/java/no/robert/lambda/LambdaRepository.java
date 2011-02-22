@@ -11,20 +11,27 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 
 public class LambdaRepository
 {
-
     private EntityManagerFactory entityManagerFactory;
-
-
-    public <T> List<T> find( CriteriaQuery<T> query )
-    {
-        EntityManager entityMgr = entityManagerFactory.createEntityManager();
-        return entityMgr.createQuery( query ).getResultList();
-    }
-
-
+    private EntityManager entityManager;
+    
     public void setEntityManagerFactory( EntityManagerFactory entityManagerFactory )
     {
         this.entityManagerFactory = entityManagerFactory;
     }
+
+    public void setEntityManager( EntityManager entityManager )
+    {
+        this.entityManager = entityManager;
+    }
+
+    public EntityManager getEntityManager()
+    {
+        return entityManager;
+    }
+    
+    public <T> List<T> find( CriteriaQuery<T> query )
+    {
+        return entityManager.createQuery( query ).getResultList();
+    }   
 
 }

@@ -9,54 +9,50 @@ import javax.persistence.criteria.Root;
 
 public class AuthorDAO
 {
-    EntityManagerFactory entityManagerFactory;
+    private EntityManagerFactory entityManagerFactory;
+    private EntityManager entityManager;
 
-    public AuthorDAO()
+    public void setEntityManagerFactory( EntityManagerFactory entityMgrFactory )
     {
-        try
-        {
-            setUp();
-        }
-        catch ( Exception e )
-        {
-            e.printStackTrace();
-        }
+        this.entityManagerFactory = entityMgrFactory;        
+    }
+    
+    public EntityManagerFactory getEntityManagerFactory()
+    {
+        return this.entityManagerFactory;
+    }
+    
+    public void setEntityManager( EntityManager entityManager )
+    {
+        this.entityManager = entityManager;
+    }
+    
+    public EntityManager getEntitManager()
+    {
+        return this.entityManager;
     }
 
-    private void setUp() throws Exception
-    {
-        entityManagerFactory = Persistence.createEntityManagerFactory( "no.robert.lambda" );
-    }
     
     public void add( Author author )
     {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-        em.persist( author );
-        em.getTransaction().commit();
-        em.close();
+        entityManager.persist( author );
     }
     
     public int getNumberOfAuthors()
     {
-        EntityManager em = entityManagerFactory.createEntityManager();
         CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
-        
         CriteriaQuery<Author> criteria = builder.createQuery( Author.class );
-
+        
         Root<Author> cat = criteria.from( Author.class );
-
         criteria.select( cat );        
 
-        int number = em.createQuery( criteria ).getResultList().size();
-        em.close();
+        int number = entityManager.createQuery( criteria ).getResultList().size();
     
         return number;
     }
     
     public Author getAuthor( String authorname )
     {
-        EntityManager em = entityManagerFactory.createEntityManager();
         CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
         
         CriteriaQuery<Author> criteria = builder.createQuery( Author.class );
@@ -64,16 +60,11 @@ public class AuthorDAO
         criteria.select( author );
         criteria.where( builder.equal( author.get( "name" ), authorname ) );
         
-        return em.createQuery( criteria ).getSingleResult();
+        return entityManager.createQuery( criteria ).getSingleResult();
     }
     
     public void remove( Author author )
     {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-        em.remove( em.merge( author ) );
-        em.getTransaction().commit();
-        em.close();
+        entityManager.remove( entityManager.merge( author ) );
     }
-
 }

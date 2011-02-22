@@ -1,42 +1,67 @@
 package no.robert.lambda;
 
+import static no.robert.lambda.LambdaCriteria.having;
+import static no.robert.lambda.LambdaCriteria.on;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.is;
 
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class AuthorDAOTest
 {
-    AuthorDAO authorDAO;
+    private AuthorDAO authors;
+    private LambdaRepository repository;
 
     @Before
     public void setUp()
     {
-        authorDAO = new AuthorDAO();
+        EntityManagerFactory entityMgrFactory = Persistence.createEntityManagerFactory( "no.robert.lambda" );
+        EntityManager entityManager = entityMgrFactory.createEntityManager();
+        repository = new LambdaRepository();
+        repository.setEntityManagerFactory( entityMgrFactory );
+        repository.setEntityManager( entityManager );
+        
+        authors = new AuthorDAO();
+        authors.setEntityManagerFactory( entityMgrFactory );
+        authors.setEntityManager(  entityManager );
+        authors.getEntitManager().getTransaction().begin();
+    }
+    
+    @After
+    public void tearDown()
+    {
+        authors.getEntitManager().getTransaction().rollback();
     }
     
     @Test
     public void emptyDAO()
     {
-        assertThat( authorDAO.getNumberOfAuthors(), is( 0 ) );
+        assertThat( authors.getNumberOfAuthors(), is( 0 ) );
     }
 
     @Test
     public void add()
     {        
-        authorDAO.add( new Author( "Some author" ) );
-        authorDAO.add(  new Author( "Some other author" ) );
-        assertThat( authorDAO.getNumberOfAuthors(), is( 2 ) );        
+        authors.add( new Author( "Some author" ) );
+        authors.add(  new Author( "Some other author" ) );
+        assertThat( authors.getNumberOfAuthors(), is( 2 ) );        
     }
     
     @Test
     public void get()
     {
         Author author = new Author( "An author" );
-        authorDAO.add( author );
+        authors.add( author );
         
-        Author theAuthor = authorDAO.getAuthor( "An author" );
+        Author theAuthor = authors.getAuthor( "An author" );
         
         assertThat( theAuthor.getName(), is( "An author" ) );
     }
@@ -44,13 +69,23 @@ public class AuthorDAOTest
     @Test
     public void remove()
     {
-        int numberofauthors = authorDAO.getNumberOfAuthors();
+        int numberofauthors = authors.getNumberOfAuthors();
         Author author = new Author( "Another" );
-        authorDAO.add( author );
-        assertThat( authorDAO.getNumberOfAuthors(), is( numberofauthors+1 ) );
+        authors.add( author );
+        assertThat( authors.getNumberOfAuthors(), is( numberofauthors+1 ) );
         
-        authorDAO.remove( author );
-        assertThat( authorDAO.getNumberOfAuthors(), is( numberofauthors ) );
+        authors.remove( author );
+        assertThat( authors.getNumberOfAuthors(), is( numberofauthors ) );
+    }
+    
+    @Test
+    public void lambdaTest()
+    {
+        Author author = new Author( "Someone" );
+        authors.add( author );
+        
+        List<Author> authors = repository.find( having(Author.class, on( Author.class ).getName() ).eq( "Someone" ) );
+        assertThat( authors.size(), is( 1 ) );
     }
 
 }
