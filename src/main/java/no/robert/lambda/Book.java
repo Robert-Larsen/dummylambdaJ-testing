@@ -23,6 +23,8 @@ public class Book
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy = "increment")
     private Long id;
+    private boolean available;
+    private boolean isPaperback;
 
     public Book( String title, Set<Author> authors, int pages )
     {
@@ -84,5 +86,24 @@ public class Book
     {
         this.title = title;
     }
-
-}
+    
+    public boolean isAvailable()
+    {
+        return this.available;
+    }
+    
+    public void setAvailable( boolean available )
+    {
+        this.available = available;
+    }
+    
+    public boolean hasPaperback()
+    {
+        return this.isPaperback;
+    }
+    
+    public void setPaperback( boolean paperback)
+    {
+        this.isPaperback = paperback;
+    }
+ }

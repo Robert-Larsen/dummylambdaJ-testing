@@ -2,7 +2,10 @@ package no.robert.lambda;
 
 import static org.apache.commons.lang.StringUtils.uncapitalize;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -24,6 +27,7 @@ public class LambdaCriteria<T>
     private static final ThreadLocal<Class<?>> lastType = new ThreadLocal<Class<?>>();
     private final Method method;
     private final Class<T> type;
+    private List<FieldResolver> fieldResolverStrategies = new ArrayList<FieldResolver>();
     
     private final EntityManagerFactory entityManagerFactory;
     
@@ -33,14 +37,12 @@ public class LambdaCriteria<T>
             @Override
             public Object invoke( Object arg0, Method method, Object[] arg2 ) throws Throwable
             {
-                //System.out.println( type.getSimpleName() + "." + method.getName() );
-                
+                           
                 LambdaCriteria.lastMethod.set( method );
                 LambdaCriteria.lastType.set( type );
                 
                 return null;
-            }
-            
+            }            
         });
     }
     
@@ -50,6 +52,7 @@ public class LambdaCriteria<T>
         this.method = method;
         this.type = type;
         entityManagerFactory = Persistence.createEntityManagerFactory( "no.robert.lambda" );
+        fieldResolverStrategies.add( new DefaultFieldResolver() );
     }
 
     public static <T> LambdaCriteria<T> having( Class<T> type, Object expression )
@@ -59,17 +62,24 @@ public class LambdaCriteria<T>
 
     public CriteriaQuery<T> eq( String string )
     {
-        //System.out.println( method.getName() + " = " + string );
         CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
         
         CriteriaQuery<T> criteria = builder.createQuery( type );
-        Path<Object> property = criteria.from( type ).get( asProperty( method ) );
+        //Path<Object> property = criteria.from( type ).get( asProperty( method ) );
+        Path<Object> property = criteria.from( type ).get( asProperty( method ).getName() );
         return criteria.where( builder.equal( property, string ) );
     }
-
-
-    private String asProperty( Method method )
+    
+    private Field asProperty( Method method )
     {
-        return uncapitalize( method.getName().substring( 3 ) );
+        for(FieldResolver fieldResolver : fieldResolverStrategies)
+        {
+            Field field = fieldResolver.resolveFrom(type, method);
+            if (field != null)
+                return field;
+        }
+         throw new RuntimeException("Unable to resolve field from " + method.getName() + "()");
+        
+        //return uncapitalize( method.getName().substring( 3 ) );
     }
 }

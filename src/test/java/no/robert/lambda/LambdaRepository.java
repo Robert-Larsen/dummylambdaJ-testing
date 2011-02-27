@@ -32,6 +32,11 @@ public class LambdaRepository
     public <T> List<T> find( CriteriaQuery<T> query )
     {
         return entityManager.createQuery( query ).getResultList();
-    }   
+    }
+    
+    public <T> T findSingle( CriteriaQuery<T> query )
+    {
+        return entityManager.createQuery( query ).getSingleResult();
+    }
 
 }

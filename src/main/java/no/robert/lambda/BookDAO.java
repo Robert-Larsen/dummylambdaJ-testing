@@ -9,14 +9,22 @@ package no.robert.lambda;
  import java.util.ArrayList;
  import java.util.List;
  */
+import static no.robert.lambda.LambdaCriteria.having;
+import static no.robert.lambda.LambdaCriteria.on;
+
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.criteria.*;
+
+import no.robert.lambda.LambdaRepository;
 
 public class BookDAO
 {
     private EntityManagerFactory entityManagerFactory;
     private EntityManager entityManager;
+    private LambdaRepository repository = new LambdaRepository();
 
     public void setEntityManagerFactory( EntityManagerFactory entityManagerFactory )
     {
@@ -43,8 +51,11 @@ public class BookDAO
         entityManager.persist( bok );
     }
 
-    public Book getBook( String bookname )
-    {
+    public Book getBookWithTitle( String bookname )
+    {        
+        return repository.findSingle( having(Book.class, on( Book.class ).getTitle() ).eq( bookname ) );
+        
+        /*
         CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
 
         CriteriaQuery<Book> criteria = builder.createQuery( Book.class );
@@ -53,6 +64,7 @@ public class BookDAO
         criteria.where( builder.equal( book.get( "title" ), bookname ) );
 
         return entityManager.createQuery( criteria ).getSingleResult();
+        */
     }
 
     public int getNumberOfBooks()
