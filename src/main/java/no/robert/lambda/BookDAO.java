@@ -24,7 +24,6 @@ public class BookDAO
 {
     private EntityManagerFactory entityManagerFactory;
     private EntityManager entityManager;
-    private LambdaRepository repository = new LambdaRepository();
 
     public void setEntityManagerFactory( EntityManagerFactory entityManagerFactory )
     {
@@ -49,22 +48,6 @@ public class BookDAO
     public void add( Book bok )
     {
         entityManager.persist( bok );
-    }
-
-    public Book getBookWithTitle( String bookname )
-    {        
-        return repository.findSingle( having(Book.class, on( Book.class ).getTitle() ).eq( bookname ) );
-        
-        /*
-        CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
-
-        CriteriaQuery<Book> criteria = builder.createQuery( Book.class );
-        Root<Book> book = criteria.from( Book.class );
-        criteria.select( book );
-        criteria.where( builder.equal( book.get( "title" ), bookname ) );
-
-        return entityManager.createQuery( criteria ).getSingleResult();
-        */
     }
 
     public int getNumberOfBooks()

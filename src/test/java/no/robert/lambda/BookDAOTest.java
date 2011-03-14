@@ -62,12 +62,14 @@ public class BookDAOTest
     }
 
     @Test
+    @Ignore
     public void emptyDAO()
     {
         assertThat( books.getNumberOfBooks(), is( 0 ) );
     }
 
-    @Test   
+    @Test
+    @Ignore
     public void add()
     {
         Author author1 = new Author( "Someone" );
@@ -102,10 +104,6 @@ public class BookDAOTest
         int numberofbooks = books.getNumberOfBooks();
         books.add( new Book( "A new book", author1, 100 ) );
         assertThat( numberofbooks, is( books.getNumberOfBooks()-1 ) );
-        //Book book = books.getBook( "A new book" );
-            
-        //books.remove( book );
-
         assertThat( numberofbooks, is( books.getNumberOfBooks() ) );        
     }
     
@@ -114,13 +112,25 @@ public class BookDAOTest
     {
         Author author = new Author( "Someone" );
         authors.add( author );
-        books.add( new Book( "A book", author, 10 ) );
+        books.add( new Book( "A book", author, 12 ) );
         
-        List<Book> books = repository.find( having(Book.class, on( Book.class ).getTitle() ).eq( "A book" ) );
+        List<Book> books = repository.find( having( Book.class, on( Book.class ).getTitle() ).eq( "A book" ) );
         assertThat( books.size(), is( 1 ) );
         
-        Book b = repository.findSingle(  having( Book.class, on( Book.class).getTitle()).eq( "A book" ) );
-        assertThat( b.getTitle(), is( "A book" ) );
+        Book b = repository.findSingle(  having( Book.class, on( Book.class).getTitle() ).eq( "A book" ) );
+        assertThat( b.getPages(), is( 12 ) );
+    }
+    
+    @Test
+    public void greaterThan()
+    {
+        Author author = new Author( "Someone else" );
+        authors.add(  author );
+        Book b = new Book( "A book with more than 100 pages", author, 101 );
+        books.add( b );
+        System.out.println( having(Book.class, on( Book.class ).getPages() ).greaterThan( 101 ) );
+        //Book b = repository.findSingle(  );
+        //assertThat( b.getPages(), is( 101 ) );
     }
     
 

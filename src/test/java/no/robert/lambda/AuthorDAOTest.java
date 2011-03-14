@@ -88,7 +88,7 @@ public class AuthorDAOTest
         Author author = new Author( "Someone" );
         authors.add( author );
         
-        List<Author> authors = repository.find( having(Author.class, on( Author.class ).getName() ).eq( "Someone" ) );
+        List<Author> authors = repository.find( having( Author.class, on( Author.class ).getName() ).eq( "Someone" ) );
         assertThat( authors.size(), is( 1 ) );
     }
 

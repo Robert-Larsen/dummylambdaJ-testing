@@ -37,10 +37,8 @@ public class LambdaCriteria<T>
             @Override
             public Object invoke( Object arg0, Method method, Object[] arg2 ) throws Throwable
             {
-                           
                 LambdaCriteria.lastMethod.set( method );
-                LambdaCriteria.lastType.set( type );
-                
+                LambdaCriteria.lastType.set( type );               
                 return null;
             }            
         });
@@ -56,8 +54,18 @@ public class LambdaCriteria<T>
     }
 
     public static <T> LambdaCriteria<T> having( Class<T> type, Object expression )
-    {
+    {   
         return new LambdaCriteria( lastMethod.get(), lastType.get() );
+    }
+    
+    public CriteriaQuery<T> greaterThan( int value )
+    {
+        CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
+        CriteriaQuery<T> criteria = builder.createQuery( type );
+        
+        Integer i = new Integer( value );
+        Path<Object> property = criteria.from( type ).get( asProperty( method ).getName() );
+        return criteria.where( builder.gt( property.as( Integer.class ), value ) );       
     }
 
     public CriteriaQuery<T> eq( String string )
@@ -69,7 +77,7 @@ public class LambdaCriteria<T>
         Path<Object> property = criteria.from( type ).get( asProperty( method ).getName() );
         return criteria.where( builder.equal( property, string ) );
     }
-    
+        
     private Field asProperty( Method method )
     {
         for(FieldResolver fieldResolver : fieldResolverStrategies)

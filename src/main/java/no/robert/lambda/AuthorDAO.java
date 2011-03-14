@@ -31,7 +31,6 @@ public class AuthorDAO
     {
         return this.entityManager;
     }
-
     
     public void add( Author author )
     {
