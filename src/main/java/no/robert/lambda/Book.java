@@ -6,7 +6,8 @@ import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
+
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -17,7 +18,8 @@ public class Book
 {
     private String title;
     private int pages;
-    @OneToMany
+    private double price;
+    @ManyToMany
     private Set<Author> authors;
     @Id
     @GeneratedValue(generator="increment")
@@ -26,19 +28,21 @@ public class Book
     private boolean available;
     private boolean isPaperback;
 
-    public Book( String title, Set<Author> authors, int pages )
+    public Book( String title, Set<Author> authors, int pages, double price )
     {
         this.title = title;
         this.authors = authors;
         this.pages = pages;
+        this.price = price;
     }
     
-    public Book( String title, Author author, int pages )
+    public Book( String title, Author author, int pages, double price )
     {
         this.title = title;
         this.authors = new HashSet<Author>();
         this.authors.add( author );
         this.pages = pages;
+        this.price = price;
     }
 
     public Book()
@@ -65,6 +69,16 @@ public class Book
     public void setPages( int pages )
     {
         this.pages = pages;
+    }
+    
+    public double getPrice()
+    {
+        return this.price;
+    }
+    
+    public void setPrice( double price )
+    {
+        this.price = price;
     }
     
     public Set<Author> getAuthors()

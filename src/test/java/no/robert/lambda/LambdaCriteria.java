@@ -12,6 +12,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 
 import net.sf.cglib.proxy.Enhancer;
@@ -23,8 +24,7 @@ import org.hibernate.criterion.Restrictions;
 
 public class LambdaCriteria<T>
 {
-    private static final ThreadLocal<Method> lastMethod = new ThreadLocal<Method>();
-    private static final ThreadLocal<Class<?>> lastType = new ThreadLocal<Class<?>>();
+
     private final Method method;
     private final Class<T> type;
     private List<FieldResolver> fieldResolverStrategies = new ArrayList<FieldResolver>();
@@ -32,16 +32,8 @@ public class LambdaCriteria<T>
     private final EntityManagerFactory entityManagerFactory;
     
     public static <T> T on(final Class<T> type) {
-        return (T)Enhancer.create( type, new InvocationHandler() {
-
-            @Override
-            public Object invoke( Object arg0, Method method, Object[] arg2 ) throws Throwable
-            {
-                LambdaCriteria.lastMethod.set( method );
-                LambdaCriteria.lastType.set( type );               
-                return null;
-            }            
-        });
+        
+        return (T) Enhancer.create( type, new DefaultInvocationHandler( type ) );
     }
     
     
@@ -55,18 +47,43 @@ public class LambdaCriteria<T>
 
     public static <T> LambdaCriteria<T> having( Class<T> type, Object expression )
     {   
-        return new LambdaCriteria( lastMethod.get(), lastType.get() );
+        return new LambdaCriteria( DefaultInvocationHandler.lastMethod.get(), DefaultInvocationHandler.lastType.get() );
     }
     
     public CriteriaQuery<T> greaterThan( int value )
     {
         CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
         CriteriaQuery<T> criteria = builder.createQuery( type );
-        
-        Integer i = new Integer( value );
-        Path<Object> property = criteria.from( type ).get( asProperty( method ).getName() );
-        return criteria.where( builder.gt( property.as( Integer.class ), value ) );       
+        Path<Integer> property = criteria.from( type ).get( asProperty( method ).getName() );
+        return criteria.where( builder.greaterThan( property, value ) );       
     }
+    
+    public CriteriaQuery<T> greaterThan( double value )
+    {
+        CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
+        CriteriaQuery<T> criteria = builder.createQuery( type );
+       Path<Double> property = criteria.from( type ).get( asProperty( method ).getName() );
+        return criteria.where( builder.greaterThan( property, value ) );  
+    }
+    
+    public CriteriaQuery<T> lessThan( int value )
+    {
+        CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
+        CriteriaQuery<T> criteria = builder.createQuery( type );
+        Path<Integer> property = criteria.from( type ).get( asProperty( method ).getName() );
+       
+        return criteria.where( builder.lessThan( property, value ) );  
+    }
+    
+    public CriteriaQuery<T> lessThan( double value )
+    {
+        CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
+        CriteriaQuery<T> criteria = builder.createQuery( type );
+        Path<Double> property = criteria.from( type ).get( asProperty( method ).getName() );
+       
+        return criteria.where( builder.lessThan( property, value ) );  
+    }
+
 
     public CriteriaQuery<T> eq( String string )
     {
@@ -80,14 +97,14 @@ public class LambdaCriteria<T>
         
     private Field asProperty( Method method )
     {
-        for(FieldResolver fieldResolver : fieldResolverStrategies)
+        for( FieldResolver fieldResolver : fieldResolverStrategies )
         {
-            Field field = fieldResolver.resolveFrom(type, method);
-            if (field != null)
+            Field field = fieldResolver.resolveFrom( type, method );
+            if( field != null )
                 return field;
         }
          throw new RuntimeException("Unable to resolve field from " + method.getName() + "()");
         
         //return uncapitalize( method.getName().substring( 3 ) );
-    }
+    }    
 }

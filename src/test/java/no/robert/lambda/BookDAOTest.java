@@ -77,24 +77,12 @@ public class BookDAOTest
         Author author2 = new Author( "Someone else" );
         authors.add( author2 );
         Set<Author> authorsSet = new HashSet<Author>();
-        books.add( new Book( "A book", authorsSet, 100 ) );
+        books.add( new Book( "A book", authorsSet, 100, 59.90 ) );
         
-        books.add( new Book( "Another book", authorsSet, 50 ) );
+        books.add( new Book( "Another book", authorsSet, 50, 99.90 ) );
         assertThat( books.getNumberOfBooks(), is( 2 ) );
     } 
     
-    @Test
-    @Ignore
-    public void get()
-    {
-        Author author = new Author( "An author" );
-        authors.add(  author );
-        
-        books.add( new Book( "A book about books", author, 150 ) );
-        //Book b = books.getBook( "A book about books" );
-       // assertThat( b.getTitle(), is( "A book about books" ) );
-    }
-
     @Test
     @Ignore
     public void remove()
@@ -102,17 +90,18 @@ public class BookDAOTest
         Author author1 = new Author( "Someone" );
         authors.add( author1 );
         int numberofbooks = books.getNumberOfBooks();
-        books.add( new Book( "A new book", author1, 100 ) );
+        books.add( new Book( "A new book", author1, 100, 50 ) );
         assertThat( numberofbooks, is( books.getNumberOfBooks()-1 ) );
         assertThat( numberofbooks, is( books.getNumberOfBooks() ) );        
     }
     
     @Test
-    public void lambdaTest()
+    public void eq()
     {
         Author author = new Author( "Someone" );
         authors.add( author );
-        books.add( new Book( "A book", author, 12 ) );
+        books.add( new Book( "A book", author, 12, 99.50 ) );
+ 
         
         List<Book> books = repository.find( having( Book.class, on( Book.class ).getTitle() ).eq( "A book" ) );
         assertThat( books.size(), is( 1 ) );
@@ -123,17 +112,37 @@ public class BookDAOTest
     
     @Test
     public void greaterThan()
-    {
-        Author author = new Author( "Someone else" );
+    {   
+        Author author = new Author( "Someone" );     
         authors.add(  author );
-        Book b = new Book( "A book with more than 100 pages", author, 101 );
-        books.add( b );
-        System.out.println( having(Book.class, on( Book.class ).getPages() ).greaterThan( 101 ) );
-        //Book b = repository.findSingle(  );
-        //assertThat( b.getPages(), is( 101 ) );
+        books.add( new Book( "A book with more than 100 pages", author, 101, 100.5 ) );
+        Book b = repository.findSingle( having( Book.class, on( Book.class ).getPages() ).greaterThan( 10 ) );
+        assertThat( b.getTitle(), is( "A book with more than 100 pages" ) );
+        
+        
+        books.add( new Book( "An expensive book", author, 50, 500.01 ) );
+        books.add( new Book( "Another expensive book", author, 40, 1299.99 ) );
+        
+        List<Book> expensiveBooks = repository.find( having( Book.class, on( Book.class ).getPrice() ).greaterThan( 500.00 ) );
+        
+        assertThat( expensiveBooks.size(), is( 2 ) );       
     }
     
-
-    
-    
+    @Test
+    public void lessThan()
+    {
+        Author author = new Author( "Someone" );     
+        authors.add(  author );
+        books.add( new Book( "A book with less than 100 pages", author, 90, 100.5 ) );
+        Book b = repository.findSingle( having( Book.class, on( Book.class ).getPages() ).lessThan( 100 ) );
+        assertThat( b.getTitle(), is( "A book with less than 100 pages" ) );
+                
+        books.add( new Book( "A cheap book", author, 50, 29.90 ) );
+        books.add( new Book( "Another cheap book", author, 40, 9.99 ) );
+        
+        List<Book> expensiveBooks = repository.find( having( Book.class, on( Book.class ).getPrice() ).lessThan(  50.00 ) );
+        
+        assertThat( expensiveBooks.size(), is( 2 ) );       
+        
+    }
 }
