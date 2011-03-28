@@ -17,7 +17,7 @@ public class DefaultInvocationHandler<T> implements InvocationHandler
     @Override
     public Object invoke( Object arg0, Method method, Object[] arg2 ) throws Throwable
     {
-        lastMethod.set( method );            
+        lastMethod.set( method );       
         if( lastMethod.get().getReturnType().isPrimitive() )
         {            
             String typeName = lastMethod.get().getReturnType().getSimpleName();

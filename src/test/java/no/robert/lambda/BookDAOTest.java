@@ -129,6 +129,24 @@ public class BookDAOTest
     }
     
     @Test
+    public void greaterThanOrEqualTo()
+    {   
+        Author author = new Author( "Someone" );     
+        authors.add(  author );
+        books.add( new Book( "A book with more than 100 pages", author, 101, 100.5 ) );
+        Book b = repository.findSingle( having( Book.class, on( Book.class ).getPages() ).greaterThanOrEqualTo( 101 ) );
+        assertThat( b.getTitle(), is( "A book with more than 100 pages" ) );
+        
+        
+        books.add( new Book( "An expensive book", author, 50, 500.01 ) );
+        books.add( new Book( "Another expensive book", author, 40, 1299.99 ) );
+        
+        List<Book> expensiveBooks = repository.find( having( Book.class, on( Book.class ).getPrice() ).greaterThanOrEqualTo( 500.01 ) );
+        
+        assertThat( expensiveBooks.size(), is( 2 ) );       
+    }
+    
+    @Test
     public void lessThan()
     {
         Author author = new Author( "Someone" );     
@@ -142,7 +160,23 @@ public class BookDAOTest
         
         List<Book> expensiveBooks = repository.find( having( Book.class, on( Book.class ).getPrice() ).lessThan(  50.00 ) );
         
-        assertThat( expensiveBooks.size(), is( 2 ) );       
+        assertThat( expensiveBooks.size(), is( 2 ) );            
+    }
+    
+    @Test
+    public void lessThanOrEqualTo()
+    {
+        Author author = new Author( "Someone" );     
+        authors.add(  author );
+        books.add( new Book( "A book with less than 100 pages", author, 90, 100.5 ) );
+        Book b = repository.findSingle( having( Book.class, on( Book.class ).getPages() ).lessThanOrEqualTo( 90 ) );
+        assertThat( b.getTitle(), is( "A book with less than 100 pages" ) );
+                
+        books.add( new Book( "A cheap book", author, 50, 29.90 ) );
+        books.add( new Book( "Another cheap book", author, 40, 9.99 ) );
         
+        List<Book> expensiveBooks = repository.find( having( Book.class, on( Book.class ).getPrice() ).lessThanOrEqualTo(  29.90 ) );
+        
+        assertThat( expensiveBooks.size(), is( 2 ) );            
     }
 }

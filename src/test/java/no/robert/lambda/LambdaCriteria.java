@@ -22,7 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
 
-public class LambdaCriteria<T>
+public class LambdaCriteria<T, R>
 {
 
     private final Method method;
@@ -45,54 +45,71 @@ public class LambdaCriteria<T>
         fieldResolverStrategies.add( new DefaultFieldResolver() );
     }
 
-    public static <T> LambdaCriteria<T> having( Class<T> type, Object expression )
+    public static <T, R> LambdaCriteria<T, R> having( Class<T> type, R expression )
     {   
         return new LambdaCriteria( DefaultInvocationHandler.lastMethod.get(), DefaultInvocationHandler.lastType.get() );
     }
     
-    public CriteriaQuery<T> greaterThan( int value )
-    {
+    public CriteriaQuery<T> greaterThan( R expression )
+    {         
         CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
         CriteriaQuery<T> criteria = builder.createQuery( type );
-        Path<Integer> property = criteria.from( type ).get( asProperty( method ).getName() );
-        return criteria.where( builder.greaterThan( property, value ) );       
+        if( expression instanceof java.lang.Number )
+        {
+            Path<Number> property = criteria.from( type ).get( asProperty( method ).getName() );
+            
+            return criteria.where( builder.gt( property, (Number) expression ) );
+        }
+        return null;               
     }
     
-    public CriteriaQuery<T> greaterThan( double value )
+    public CriteriaQuery<T> greaterThanOrEqualTo( R expression )
+    {         
+        CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
+        CriteriaQuery<T> criteria = builder.createQuery( type );
+        if( expression instanceof java.lang.Number )
+        {
+            Path<Number> property = criteria.from( type ).get( asProperty( method ).getName() );
+            
+            return criteria.where( builder.ge( property, (Number) expression ) );
+        }
+        return null;               
+    }  
+   
+    public CriteriaQuery<T> lessThan( R expression )
     {
         CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
         CriteriaQuery<T> criteria = builder.createQuery( type );
-       Path<Double> property = criteria.from( type ).get( asProperty( method ).getName() );
-        return criteria.where( builder.greaterThan( property, value ) );  
+        if( expression instanceof java.lang.Number )
+        {
+            Path<Number> property = criteria.from( type ).get( asProperty( method ).getName() );
+            
+            return criteria.where( builder.lt( property, (Number) expression ) );
+        }
+        return null;  
     }
     
-    public CriteriaQuery<T> lessThan( int value )
+    public CriteriaQuery<T> lessThanOrEqualTo( R expression )
     {
         CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
         CriteriaQuery<T> criteria = builder.createQuery( type );
-        Path<Integer> property = criteria.from( type ).get( asProperty( method ).getName() );
-       
-        return criteria.where( builder.lessThan( property, value ) );  
-    }
-    
-    public CriteriaQuery<T> lessThan( double value )
-    {
-        CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
-        CriteriaQuery<T> criteria = builder.createQuery( type );
-        Path<Double> property = criteria.from( type ).get( asProperty( method ).getName() );
-       
-        return criteria.where( builder.lessThan( property, value ) );  
+        if( expression instanceof java.lang.Number )
+        {
+            Path<Number> property = criteria.from( type ).get( asProperty( method ).getName() );
+            
+            return criteria.where( builder.le( property, (Number) expression ) );
+        }
+        return null;  
     }
 
-
-    public CriteriaQuery<T> eq( String string )
+    public CriteriaQuery<T> eq( R expression )
     {
         CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
         
         CriteriaQuery<T> criteria = builder.createQuery( type );
         //Path<Object> property = criteria.from( type ).get( asProperty( method ) );
         Path<Object> property = criteria.from( type ).get( asProperty( method ).getName() );
-        return criteria.where( builder.equal( property, string ) );
+        return criteria.where( builder.equal( property, expression ) );
     }
         
     private Field asProperty( Method method )

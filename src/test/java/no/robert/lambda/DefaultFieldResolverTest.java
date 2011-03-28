@@ -19,7 +19,7 @@ public class DefaultFieldResolverTest
         Method method = null;
         try
         {
-            method = bookClass.getMethod(  "getTitle" );
+            method = bookClass.getMethod( "getTitle" );
         }
         catch ( SecurityException e )
         {
