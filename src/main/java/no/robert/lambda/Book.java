@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 
 import javax.persistence.Table;
 
@@ -19,6 +20,8 @@ public class Book
     private String title;
     private int pages;
     private double price;
+    @OneToOne
+    private Something something;
     @ManyToMany
     private Set<Author> authors;
     @Id
@@ -28,12 +31,31 @@ public class Book
     private boolean available;
     private boolean isPaperback;
 
-    public Book( String title, Set<Author> authors, int pages, double price )
+    public Book( String title, Set<Author> authors, int pages, double price, Something something )
     {
         this.title = title;
         this.authors = authors;
         this.pages = pages;
         this.price = price;
+        this.something = something;
+    }
+    
+    public Book( String title, Set<Author> authors, int pages, double price )
+    {
+        this.title = title;
+        this.authors = authors;
+        this.pages = pages;
+        this.price = price;        
+    }
+    
+    public Book( String title, Author author, int pages, double price, Something something )
+    {
+        this.title = title;
+        this.authors = new HashSet<Author>();
+        this.authors.add( author );
+        this.pages = pages;
+        this.price = price;
+        this.something = something;
     }
     
     public Book( String title, Author author, int pages, double price )
@@ -42,7 +64,7 @@ public class Book
         this.authors = new HashSet<Author>();
         this.authors.add( author );
         this.pages = pages;
-        this.price = price;
+        this.price = price;        
     }
 
     public Book()
@@ -119,5 +141,15 @@ public class Book
     public void setPaperback( boolean paperback)
     {
         this.isPaperback = paperback;
+    }
+    
+    public Something getSomething()
+    {
+        return this.something;
+    }
+    
+    public void setSomething( Something something )
+    {
+        this.something = something;
     }
  }

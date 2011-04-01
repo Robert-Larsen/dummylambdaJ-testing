@@ -179,4 +179,17 @@ public class BookDAOTest
         
         assertThat( expensiveBooks.size(), is( 2 ) );            
     }
+    
+    @Test
+    public void testSomething()
+    {
+        Author author = new Author( "Someone" );
+        authors.add( author );
+        Something something = new Something( "Something" );
+        books.addSomething( something );
+        books.add( new Book( "A test book", author, 100, 99.90, something ) );
+        Something b = repository.findSingle( having( Something.class , on( Book.class).getSomething().getValue() ).eq( "Something" ) );
+        
+        assertThat( b.getValue(), is( "Something" ) );
+    }
 }

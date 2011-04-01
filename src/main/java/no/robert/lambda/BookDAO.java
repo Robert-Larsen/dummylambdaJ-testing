@@ -49,6 +49,11 @@ public class BookDAO
     {
         entityManager.persist( bok );
     }
+    
+    public void addSomething( Something something )
+    {
+        entityManager.persist( something );
+    }
 
     public int getNumberOfBooks()
     {

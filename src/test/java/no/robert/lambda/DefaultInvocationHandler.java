@@ -2,6 +2,9 @@ package no.robert.lambda;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+
+import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.InvocationHandler;
 
 public class DefaultInvocationHandler<T> implements InvocationHandler
@@ -9,7 +12,7 @@ public class DefaultInvocationHandler<T> implements InvocationHandler
     protected static final ThreadLocal<Method> lastMethod = new ThreadLocal<Method>();
     protected static final ThreadLocal<Class<?>> lastType = new ThreadLocal<Class<?>>();
     
-    public DefaultInvocationHandler( Class<T> type )
+    public DefaultInvocationHandler( Class<?> type )
     {
         lastType.set( type );
     }
@@ -17,8 +20,12 @@ public class DefaultInvocationHandler<T> implements InvocationHandler
     @Override
     public Object invoke( Object arg0, Method method, Object[] arg2 ) throws Throwable
     {
-        lastMethod.set( method );       
-        if( lastMethod.get().getReturnType().isPrimitive() )
+        lastMethod.set( method );
+        if( !Modifier.isFinal( method.getReturnType().getModifiers() ) )
+        {
+            return (T) Enhancer.create( method.getReturnType(), new DefaultInvocationHandler<T>( method.getReturnType() ) );
+        }
+        else if( lastMethod.get().getReturnType().isPrimitive() )
         {            
             String typeName = lastMethod.get().getReturnType().getSimpleName();
             if( typeName.equals( "int" ) )
