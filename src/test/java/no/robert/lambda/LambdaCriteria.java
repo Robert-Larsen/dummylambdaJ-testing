@@ -14,6 +14,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.InvocationHandler;
@@ -31,8 +32,8 @@ public class LambdaCriteria<T, R>
     
     private final EntityManagerFactory entityManagerFactory;
     
-    public static <T> T on(final Class<T> type) {
-        
+    public static <T> T on(final Class<T> type)
+    {       
         return (T) Enhancer.create( type, new DefaultInvocationHandler( type ) );
     }
     
@@ -46,6 +47,13 @@ public class LambdaCriteria<T, R>
     }
 
     public static <T, R> LambdaCriteria<T, R> having( Class<T> type, R expression )
+    {   
+        System.out.println(DefaultInvocationHandler.lastMethod.get());
+        System.out.println(expression );
+        return new LambdaCriteria( DefaultInvocationHandler.lastMethod.get(), DefaultInvocationHandler.lastType.get() );
+    }
+    
+    public static <T, R> LambdaCriteria<T, R> min( Class<T> type, R expression )
     {   
         return new LambdaCriteria( DefaultInvocationHandler.lastMethod.get(), DefaultInvocationHandler.lastType.get() );
     }
@@ -87,6 +95,16 @@ public class LambdaCriteria<T, R>
             return criteria.where( builder.lt( property, (Number) expression ) );
         }
         return null;  
+    }
+    
+    public CriteriaQuery<T> getAll()
+    {   
+        CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
+        CriteriaQuery<T> criteria = builder.createQuery( type );
+        Root<T> cat = criteria.from( type );
+        criteria.select( cat );
+
+        return criteria;               
     }
     
     public CriteriaQuery<T> lessThanOrEqualTo( R expression )

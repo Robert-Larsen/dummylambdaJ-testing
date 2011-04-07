@@ -181,6 +181,30 @@ public class BookDAOTest
     }
     
     @Test
+    public void getAll()
+    {
+        Author author = new Author( "Someone" );
+        authors.add( author );
+        books.add( new Book( "A book", author, 12, 99.50 ) );
+        books.add( new Book( "Another book", author, 100, 100.00 ) );
+        
+        List<Book> books = repository.find( having( Book.class, on( Book.class ) ).getAll() );
+        assertThat( books.size(), is( 2 ) );       
+    }
+    
+    @Test
+    @Ignore
+    public void min()
+    {
+        Author author = new Author( "Someone" );
+        authors.add( author );
+        books.add( new Book( "A book", author, 12, 99.50 ) );
+        books.add( new Book( "Another book", author, 100, 100.00 ) );
+        
+        
+    }
+            
+    @Test
     public void testSomething()
     {
         Author author = new Author( "Someone" );
