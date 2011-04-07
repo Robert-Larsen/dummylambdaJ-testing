@@ -8,6 +8,7 @@
 
 		<class>no.robert.lambda.Book</class>
 		<class>no.robert.lambda.Author</class>
+        <class>no.robert.lambda.Publisher</class>
 
 		<properties>
 			<property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect" />

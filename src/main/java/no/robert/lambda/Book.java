@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -19,6 +20,10 @@ public class Book
     private int pages;
     @OneToMany
     private Set<Author> authors;
+
+    @OneToOne
+    private Publisher publisher;
+
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy = "increment")
@@ -32,25 +37,30 @@ public class Book
         this.authors = authors;
         this.pages = pages;
     }
-    
+
     public Book( String title, Author author, int pages )
     {
-        this.title = title;
-        this.authors = new HashSet<Author>();
-        this.authors.add( author );
-        this.pages = pages;
+        this(title, author, pages, null);
     }
 
     public Book()
     {
-        // TODO Auto-generated constructor stub
+    }
+
+    public Book(String title, Author author, int pages, Publisher publisher) {
+        this.title = title;
+        this.publisher = publisher;
+        this.authors = new HashSet<Author>();
+        this.authors.add( author );
+        this.pages = pages;
+
     }
 
     public Long getId()
     {
         return id;
     }
-    
+
     @Id
     public void setId( Long id )
     {
@@ -61,49 +71,57 @@ public class Book
     {
         return this.pages;
     }
-    
+
     public void setPages( int pages )
     {
         this.pages = pages;
     }
-    
+
     public Set<Author> getAuthors()
     {
         return this.authors;
     }
-    
+
     public void setAuthors( Set<Author> authors )
     {
         this.authors = authors;
     }
-   
+
     public String getTitle()
     {
         return this.title;
     }
-    
+
     public void setTitle( String title )
     {
         this.title = title;
     }
-    
+
     public boolean isAvailable()
     {
         return this.available;
     }
-    
+
     public void setAvailable( boolean available )
     {
         this.available = available;
     }
-    
+
     public boolean hasPaperback()
     {
         return this.isPaperback;
     }
-    
+
     public void setPaperback( boolean paperback)
     {
         this.isPaperback = paperback;
+    }
+
+    public void setPublisher(Publisher publisher) {
+        this.publisher = publisher;
+    }
+
+    public Publisher getPublisher() {
+        return publisher;
     }
  }
