@@ -5,7 +5,6 @@ import static no.robert.lambda.LambdaCriteria.on;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,48 +12,48 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.criteria.CriteriaQuery;
-
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.InvocationHandler;
 import no.robert.lambda.Author;
 import no.robert.lambda.AuthorDAO;
 import no.robert.lambda.Book;
 import no.robert.lambda.BookDAO;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.DetachedCriteria;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 
 public class BookDAOTest
 {
     private BookDAO books;
     private AuthorDAO authors;
-    private LambdaRepository repository;    
+    private LambdaRepository repository;
+
+    private Publisher publisher;
+
 
     @Before
     public void setUp()
     {
         EntityManagerFactory entityMgrFactory = Persistence.createEntityManagerFactory( "no.robert.lambda" );
         EntityManager entityManager = entityMgrFactory.createEntityManager();
+
+        publisher = new Publisher("Manning");
+
+        entityManager.persist(publisher);
         repository = new LambdaRepository();
         repository.setEntityManagerFactory( entityMgrFactory );
         repository.setEntityManager( entityManager );
-        
+
         books = new BookDAO();
         books.setEntityManagerFactory( entityMgrFactory );
         books.setEntityManager( entityManager );
         books.getEntityManager().getTransaction().begin();
-        
+
         authors = new AuthorDAO();
         authors.setEntityManagerFactory( entityMgrFactory );
         authors.setEntityManager(  entityManager );
     }
-    
+
     @After
     public void tearDown()
     {
@@ -78,38 +77,53 @@ public class BookDAOTest
         authors.add( author2 );
         Set<Author> authorsSet = new HashSet<Author>();
         books.add( new Book( "A book", authorsSet, 100, 59.90 ) );
-        
+
         books.add( new Book( "Another book", authorsSet, 50, 99.90 ) );
         assertThat( books.getNumberOfBooks(), is( 2 ) );
-    } 
-    
+    }
+
+    @Test
+    @Ignore
+    public void get()
+    {
+        Author author = new Author( "An author" );
+        authors.add(  author );
+
+        books.add( new Book( "A book about books", author, 150 ) );
+        //Book b = books.getBook( "A book about books" );
+       // assertThat( b.getTitle(), is( "A book about books" ) );
+    }
+
     @Test
     @Ignore
     public void remove()
-    {   
+    {
         Author author1 = new Author( "Someone" );
         authors.add( author1 );
         int numberofbooks = books.getNumberOfBooks();
         books.add( new Book( "A new book", author1, 100, 50 ) );
         assertThat( numberofbooks, is( books.getNumberOfBooks()-1 ) );
-        assertThat( numberofbooks, is( books.getNumberOfBooks() ) );        
+        assertThat( numberofbooks, is( books.getNumberOfBooks() ) );
     }
-    
+
     @Test
     public void eq()
     {
         Author author = new Author( "Someone" );
         authors.add( author );
-        books.add( new Book( "A book", author, 12, 99.50 ) );
- 
-        
+        books.add( new Book( "A book", author, 12, publisher ) );
+
         List<Book> books = repository.find( having( Book.class, on( Book.class ).getTitle() ).eq( "A book" ) );
         assertThat( books.size(), is( 1 ) );
-        
-        Book b = repository.findSingle(  having( Book.class, on( Book.class).getTitle() ).eq( "A book" ) );
+
+        Book b = repository.findSingle( having( Book.class, on( Book.class).getTitle() ).eq( "A book" ) );
         assertThat( b.getPages(), is( 12 ) );
+
+        List<Book> manningBooks = repository.find(having(Book.class, on(Book.class).getPublisher().getName()).eq("Manning"));
+        assertThat(manningBooks.size(), is(1));
+        assertThat(manningBooks.get(0).getPublisher().getName(), is("Manning"));
     }
-    
+
     @Test
     public void greaterThan()
     {   
@@ -162,7 +176,6 @@ public class BookDAOTest
         
         assertThat( expensiveBooks.size(), is( 2 ) );            
     }
-    
     @Test
     public void lessThanOrEqualTo()
     {
@@ -179,19 +192,9 @@ public class BookDAOTest
         
         assertThat( expensiveBooks.size(), is( 2 ) );            
     }
-    
-    @Test
-    public void getAll()
-    {
-        Author author = new Author( "Someone" );
-        authors.add( author );
-        books.add( new Book( "A book", author, 12, 99.50 ) );
-        books.add( new Book( "Another book", author, 100, 100.00 ) );
-        
-        List<Book> books = repository.find( having( Book.class, on( Book.class ) ).getAll() );
-        assertThat( books.size(), is( 2 ) );       
-    }
-    
+
+
+
     @Test
     @Ignore
     public void min()
