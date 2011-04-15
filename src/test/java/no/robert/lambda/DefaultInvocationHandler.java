@@ -17,16 +17,19 @@ public class DefaultInvocationHandler<T> implements InvocationHandler
         lastType.set( type );
     }
     
+    @SuppressWarnings( "unchecked" )
     @Override
     public Object invoke( Object arg0, Method method, Object[] arg2 ) throws Throwable
-    {
+    {        
         lastMethod.set( method );
-        if( !Modifier.isFinal( method.getReturnType().getModifiers() ) )
+       
+        if( !Modifier.isFinal( lastMethod.get().getReturnType().getModifiers() ) )
         {
-            return (T) Enhancer.create( method.getReturnType(), new DefaultInvocationHandler<T>( method.getReturnType() ) );
+            lastType.set( lastMethod.get().getReturnType() );
+            return ( T ) Enhancer.create( lastMethod.get().getReturnType(), this );
         }
         else if( lastMethod.get().getReturnType().isPrimitive() )
-        {            
+        {   
             String typeName = lastMethod.get().getReturnType().getSimpleName();
             if( typeName.equals( "int" ) )
                 return Integer.MIN_VALUE;
@@ -44,7 +47,7 @@ public class DefaultInvocationHandler<T> implements InvocationHandler
                 return Byte.MIN_VALUE;
             else if( typeName.equals( "char" ) )
                 return Character.MIN_VALUE;
-        }
+        } 
         
         return null;
     }          

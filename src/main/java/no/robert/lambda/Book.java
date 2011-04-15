@@ -2,21 +2,22 @@ package no.robert.lambda;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name="Books")
 public class Book
 {
-    private String title;
-    private int pages;
+    private String title;   
+    
+    @ManyToMany
     private Set<Author> authors;
 
     @OneToOne
@@ -26,40 +27,41 @@ public class Book
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy = "increment")
     private Long id;
+    
+    private int pages;
+    private double price;
     private boolean available;
     private boolean isPaperback;
 
+    public Book( String title, Author author, int pages, Publisher publisher )
     {
-        this.title = title;
-        this.authors = authors;
-        this.pages = pages;
+        this( title, author, pages, publisher, -1.00, false );
     }
 
-    public Book( String title, Set<Author> authors, int pages, double price )
+    public Book( String title, Author author, int pages )
     {
-        this(title, author, pages, null);
+        this(title, author, pages, null, -1.00, false );
     }
 
     public Book()
     {
     }
 
-    public Book(String title, Author author, int pages, Publisher publisher) {
-        this.title = title;
-        this.publisher = publisher;
-        this.authors = new HashSet<Author>();
-        this.authors.add( author );
-        this.pages = pages;
-    
-    public Book( String title, Author author, int pages, double price )
+    public Book(String title, Author author, int pages, Publisher publisher, double price, boolean paperback )
     {
         this.title = title;
         this.authors = new HashSet<Author>();
         this.authors.add( author );
         this.pages = pages;
-        this.price = price;        
+        this.publisher = publisher;
+        this.price = price;
+        this.isPaperback = paperback;        
+        this.available = true;       
     }
-
+    
+    public Book( String title, Author author, int pages, double price )
+    {
+        this( title, author, pages, null, price, false );      
     }
 
     public Long getId()

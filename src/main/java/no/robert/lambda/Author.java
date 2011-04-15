@@ -8,7 +8,6 @@ import javax.persistence.Table;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
-@Table( name = "Authors" )
 public class Author
 {
     @Id
