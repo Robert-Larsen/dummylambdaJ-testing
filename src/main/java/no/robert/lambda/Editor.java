@@ -3,14 +3,12 @@ package no.robert.lambda;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
-public class Publisher {
-
+public class Editor
+{
     @Id
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy = "increment")
@@ -18,23 +16,14 @@ public class Publisher {
 
     private String name;
     
-    @OneToOne
-    private Editor editor;
+    //private Editor editor;
 
-    public Publisher()
-    {
-        
+    public Editor() {
     }
 
-    public Publisher(String name)
+    public Editor(String name)
     {
         this.setName(name);
-    }
-
-    public Publisher( String name, Editor editor )
-    {
-        this.name = name;
-        this.editor = editor;
     }
 
     public void setName(String name)
@@ -47,14 +36,5 @@ public class Publisher {
         return name;
     }
     
-    public void setEditor( Editor editor )
-    {
-        this.editor = editor;
-    }
-    
-    public Editor getEditor()
-    {
-        return editor;
-    }
 
 }

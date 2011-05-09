@@ -1,36 +1,57 @@
 package no.robert.lambda;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.InvocationHandler;
 
 public class DefaultInvocationHandler<T> implements InvocationHandler
 {       
-    protected static final ThreadLocal<Method> lastMethod = new ThreadLocal<Method>();
-    protected static final ThreadLocal<Class<?>> lastType = new ThreadLocal<Class<?>>();
-    
+    protected static final ThreadLocal<List<Method>> lastMethod = new ThreadLocal<List<Method>>();
+    protected static final ThreadLocal<List<Class<?>>> lastType = new ThreadLocal<List<Class<?>>>();
+        
     public DefaultInvocationHandler( Class<?> type )
     {
-        lastType.set( type );
-    }
+        if( lastType.get() == null )
+            lastType.set( new ArrayList<Class<?>>() );
+        if( !lastType.get().contains( type ) )
+            lastType.get().add( type );
+        
+        lastMethod.set( new ArrayList<Method>() );
+    } 
+    
+    public DefaultInvocationHandler( Class<?> type, boolean isFinal )
+    {
+        if( lastType.get() == null )
+            lastType.set( new ArrayList<Class<?>>() );
+        if( !lastType.get().contains( type ) )
+            lastType.get().add( type );
+
+        if( isFinal )
+        {
+            if( lastMethod.get() == null )
+                lastMethod.set( new ArrayList<Method>() );
+        }        
+    } 
+    
     
     @SuppressWarnings( "unchecked" )
     @Override
     public Object invoke( Object arg0, Method method, Object[] arg2 ) throws Throwable
-    {        
-        lastMethod.set( method );
-       
-        if( !Modifier.isFinal( lastMethod.get().getReturnType().getModifiers() ) )
-        {
-            lastType.set( lastMethod.get().getReturnType() );
-            return ( T ) Enhancer.create( lastMethod.get().getReturnType(), this );
+    {    
+        if( !lastMethod.get().contains( method ) )
+            lastMethod.get().add( method );
+  
+        if( !Modifier.isFinal( method.getReturnType().getModifiers() ) )
+        {                       
+            return ( T ) Enhancer.create( method.getReturnType(), new DefaultInvocationHandler<T>( method.getReturnType(), true ) );
         }
-        else if( lastMethod.get().getReturnType().isPrimitive() )
+        else if( method.getReturnType().isPrimitive() )
         {   
-            String typeName = lastMethod.get().getReturnType().getSimpleName();
+            String typeName = method.getReturnType().getSimpleName();
             if( typeName.equals( "int" ) )
                 return Integer.MIN_VALUE;
             else if( typeName.equals( "double" ) )
@@ -47,9 +68,7 @@ public class DefaultInvocationHandler<T> implements InvocationHandler
                 return Byte.MIN_VALUE;
             else if( typeName.equals( "char" ) )
                 return Character.MIN_VALUE;
-        } 
-        
+        }        
         return null;
-    }          
-
+    }
 }
